@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D Love View with Floating Images</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      perspective: 1000px;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .scene {
+      width: 100vw;
+      height: 100vh;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+      position: relative;
+    }
+
+    .floater {
+      position: absolute;
+      animation: floating 6s ease-in-out infinite;
+    }
+
+    .word, .floating-img {
+      transform: translateZ(0);
+      animation: fall var(--duration) linear forwards;
+    }
+
+    .word {
+      color: hotpink;
+      font-size: 2em;
+      font-weight: bold;
+      text-shadow: 0 0 10px #ff80bf, 0 0 20px #ff4da6;
+    }
+
+    .floating-img {
+      width: 80px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 192, 203, 0.8);
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-10vh) translateZ(var(--z));
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) translateZ(var(--z));
+        opacity: 0;
+      }
+    }
+
+    @keyframes floating {
+      0%   { transform: translateX(0px) rotateZ(0deg); }
+      25%  { transform: translateX(-10px) rotateZ(-1deg); }
+      50%  { transform: translateX(10px) rotateZ(1deg); }
+      75%  { transform: translateX(-5px) rotateZ(-1deg); }
+      100% { transform: translateX(0px) rotateZ(0deg); }
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <audio autoplay loop>
+    <source src="romantic.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="scene" id="scene"></div>
+
+  <script>
+    const scene = document.getElementById('scene');
+    const texts = ["be ma gurl ?", "labubu", " CRYSTAL💗", "💌💘💗💖"];
+    const images = ["image1.jpg", "image2.jpg", "image3.jpg"];
+
+    function spawnFloatingElement() {
+      const floater = document.createElement('div');
+      floater.className = 'floater';
+      floater.style.left = Math.random() * 100 + 'vw';
+      floater.style.top = '-10vh';
+
+      const isImage = Math.random() > 0.5;
+      let element;
+
+      if (isImage) {
+        element = document.createElement('img');
+        element.className = 'floating-img';
+        element.src = images[Math.floor(Math.random() * images.length)];
+      } else {
+        element = document.createElement('div');
+        element.className = 'word';
+        element.innerText = texts[Math.floor(Math.random() * texts.length)];
+      }
+
+      const duration = 10 + Math.random() * 10;
+      element.style.setProperty('--z', (Math.random() * 800 - 400) + 'px');
+      element.style.setProperty('--duration', duration + 's');
+
+      floater.appendChild(element);
+      scene.appendChild(floater);
+
+      setTimeout(() => {
+        scene.removeChild(floater);
+      }, duration * 1000);
+    }
+
+    setInterval(spawnFloatingElement, 400);
+
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 30;
+      const y = (e.clientY / window.innerHeight - 0.5) * -30;
+      scene.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      const x = (touch.clientX / window.innerWidth - 0.5) * 30;
+      const y = (touch.clientY / window.innerHeight - 0.5) * -30;
+      scene.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+    }, { passive: true });
+  </script>
+</body>
+</html>
